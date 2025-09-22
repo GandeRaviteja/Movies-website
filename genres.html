@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieZone - Explore Genres</title>
+    <style>
+        :root {
+            --bg-1: #0B0F13;
+            --bg-2: #0F1720;
+            --accent: #E50914;
+            --card: rgba(255, 255, 255, 0.03);
+            --muted: #9AA4AD;
+            --text: #EEF2F6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            color: var(--text);
+            background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%), url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h10v10H0zM20 20h10v10H20zM40 40h10v10H40zM60 60h10v10H60zM80 80h10v10H80z" fill="rgba(255,255,255,0.02)" /></svg>');
+            mix-blend-mode: multiply;
+            opacity: 0.8;
+        }
+
+        header {
+            background: rgba(10, 12, 14, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+        }
+
+        header h1 {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #ccc;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+        
+        nav a.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2px;
+        }
+
+        nav a:not(.active):hover {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, color 0.3s ease;
+        }
+
+        nav button:hover {
+            transform: translateY(-2px);
+            color: var(--accent);
+        }
+        
+        .search-container-header {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-container-header input {
+            padding: 8px 12px;
+            border: 1px solid #333;
+            background: #1a1a1a;
+            color: var(--text);
+            border-radius: 5px;
+            margin-right: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .search-container-header button {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .search-container-header button:hover {
+            background: #b20710;
+        }
+
+        main {
+            display: flex;
+            padding: 20px 30px 60px;
+            gap: 40px;
+        }
+        
+        .genre-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            height: fit-content;
+        }
+        
+        .genre-list {
+            list-style: none;
+        }
+        
+        .genre-list li {
+            margin-bottom: 4px;
+        }
+
+        .genre-list a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--muted);
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .genre-list a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+        
+        /* Active state for genre links */
+        .genre-list a.active {
+            background: var(--accent); /* Red background */
+            color: var(--text); /* White text for contrast */
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex-grow: 1;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+        }
+
+        .movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            overflow: hidden;
+            width: 180px;
+            flex-grow: 1;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            /* Red shadow on hover */
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.7); 
+        }
+
+        .card img {
+            width: 100%;
+            display: block;
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .card .info {
+            padding: 15px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        footer {
+            background: #111;
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+        }
+        
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 20px;
+            }
+
+            .search-container-header {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .search-container-header input,
+            .search-container-header button {
+                width: 48%;
+            }
+            
+            main {
+                flex-direction: column;
+                padding: 20px;
+            }
+            .genre-sidebar {
+                width: 100%;
+            }
+            .movies-container {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎬 MovieZone</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="genres.html" class="active">Genres</a></li>
+                <li><a href="#">Top Rated</a></li>
+                <li><a href="#">About</a></li>
+                <li>
+                    <div class="search-container-header">
+                        <input type="text" id="searchInput" placeholder="Search...">
+                        <button id="searchButton">Search</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <aside class="genre-sidebar">
+            <h3 style="margin-bottom: 10px; color: var(--text);">Explore Genres</h3>
+            <ul class="genre-list" id="genreList">
+                <li><a href="#" data-genre-id="28" data-genre-name="Action">Action</a></li>
+                <li><a href="#" data-genre-id="10749" data-genre-name="Romance">Romance</a></li>
+                <li><a href="#" data-genre-id="35" data-genre-name="Comedy">Comedy</a></li>
+                <li><a href="#" data-genre-id="18" data-genre-name="Drama">Drama</a></li>
+                <li><a href="#" data-genre-id="53" data-genre-name="Thriller">Thriller</a></li>
+                <li><a href="#" data-genre-id="27" data-genre-name="Horror">Horror</a></li>
+                <li><a href="#" data-genre-id="9648" data-genre-name="Mystery">Mystery</a></li>
+                <li><a href="#" data-genre-id="80" data-genre-name="Crime">Crime</a></li>
+                <li><a href="#" data-genre-id="10751" data-genre-name="Family">Family</a></li>
+                <li><a href="#" data-genre-id="36" data-genre-name="Historical">Historical</a></li>
+                <li><a href="#" data-genre-id="10752" data-genre-name="War">War</a></li>
+                <li><a href="#" data-genre-id="14" data-genre-name="Fantasy">Fantasy</a></li>
+                <li><a href="#" data-genre-id="99" data-genre-name="Documentary">Documentary</a></li>
+                <li><a href="#" data-genre-id="10770" data-genre-name="TV Movie">TV Movie</a></li>
+            </ul>
+        </aside>
+
+        <section class="main-content">
+            <h2 class="section-title" id="genreTitle">Explore Tollywood Genres</h2>
+            <div id="moviesContainer" class="movies-container">
+                
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+1" alt="Action Film 1 Poster">
+                    <div class="info">
+                        <h3>Action Film 1</h3>
+                        <p>⭐ 8.5</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+2" alt="Action Film 2 Poster">
+                    <div class="info">
+                        <h3>Action Film 2</h3>
+                        <p>⭐ 7.8</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+3" alt="Action Film 3 Poster">
+                    <div class="info">
+                        <h3>Action Film 3</h3>
+                        <p>⭐ 9.1</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+4" alt="Action Film 4 Poster">
+                    <div class="info">
+                        <h3>Action Film 4</h3>
+                        <p>⭐ 6.9</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+5" alt="Action Film 5 Poster">
+                    <div class="info">
+                        <h3>Action Film 5</h3>
+                        <p>⭐ 8.2</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+6" alt="Action Film 6 Poster">
+                    <div class="info">
+                        <h3>Action Film 6</h3>
+                        <p>⭐ 7.5</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+7" alt="Action Film 7 Poster">
+                    <div class="info">
+                        <h3>Action Film 7</h3>
+                        <p>⭐ 8.8</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+8" alt="Action Film 8 Poster">
+                    <div class="info">
+                        <h3>Action Film 8</h3>
+                        <p>⭐ 7.1</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+9" alt="Action Film 9 Poster">
+                    <div class="info">
+                        <h3>Action Film 9</h3>
+                        <p>⭐ 9.0</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+10" alt="Action Film 10 Poster">
+                    <div class="info">
+                        <h3>Action Film 10</h3>
+                        <p>⭐ 7.6</p>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        © 2025 MovieZone. All Rights Reserved.
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const API_KEY = 'YOUR_TMDB_API_KEY_HERE';
+        const genreList = document.getElementById('genreList');
+        const genreLinks = genreList.querySelectorAll('a');
+        const genreTitle = document.getElementById('genreTitle');
+        const moviesContainer = document.getElementById('moviesContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+
+        const fetchMoviesByGenre = async (genreId, genreName) => {
+            if (API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+                console.warn("Please replace 'YOUR_TMDB_API_KEY_HERE' with your actual TMDb API key to fetch real movie data.");
+                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Please provide a valid API key to load movies.</p>';
+                return;
+            }
+
+            const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&with_original_language=te&sort_by=popularity.desc`;
+            
+            moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Loading real movies...</p>';
+            genreTitle.textContent = `Tollywood ${genreName} Movies`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                displayMovies(data.results, genreName);
+            } catch (error) {
+                console.error('There was a problem fetching the movies:', error);
+                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Sorry, we could not load the movies for ' + genreName + ' at this time. Please check your API key and network connection.</p>';
+            }
+        };
+
+        const displayMovies = (movies, currentGenreName) => {
+            moviesContainer.innerHTML = '';
+            if (movies.length === 0) {
+                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">No movies found for ' + currentGenreName + '.</p>';
+            }
+            movies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.classList.add('card');
+                const imagePath = movie.poster_path ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : 'https://via.placeholder.com/300x450.png?text=No+Image+Found';
+                const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
+                
+                movieCard.innerHTML = `
+                    <img src="${imagePath}" alt="${movie.title} Poster">
+                    <div class="info">
+                        <h3>${movie.title}</h3>
+                        <p>⭐ ${rating}</p>
+                    </div>
+                `;
+                moviesContainer.appendChild(movieCard);
+            });
+        };
+
+        const handleGenreClick = (event) => {
+            event.preventDefault();
+
+            genreLinks.forEach(link => link.classList.remove('active'));
+
+            const clickedLink = event.target;
+            clickedLink.classList.add('active');
+
+            const genreId = clickedLink.dataset.genreId;
+            const genreName = clickedLink.dataset.genreName;
+
+            const newUrl = `${window.location.pathname}?genreId=${genreId}&genreName=${genreName}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+
+            fetchMoviesByGenre(genreId, genreName);
+        };
+
+        genreLinks.forEach(link => {
+            link.addEventListener('click', handleGenreClick);
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialGenreId = urlParams.get('genreId');
+        const initialGenreName = urlParams.get('genreName');
+
+        if (initialGenreId && initialGenreName) {
+            const initialLink = document.querySelector(`a[data-genre-id="${initialGenreId}"]`);
+            if (initialLink) {
+                initialLink.classList.add('active');
+                fetchMoviesByGenre(initialGenreId, initialGenreName);
+            }
+        } else {
+            const defaultGenreLink = document.querySelector('a[data-genre-id="28"]');
+            if (defaultGenreLink) {
+                defaultGenreLink.classList.add('active');
+                fetchMoviesByGenre('28', 'Action');
+            }
+        }
+        
+        const performSearch = () => {
+            const query = searchInput.value;
+            if (query.trim() !== '') {
+                window.location.href = `index.html?searchQuery=${encodeURIComponent(query)}`;
+            }
+        };
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+    });
+</script>
+<!--     
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const genreList = document.getElementById('genreList');
+            const genreLinks = genreList.querySelectorAll('a');
+            const genreTitle = document.getElementById('genreTitle');
+            const moviesContainer = document.getElementById('moviesContainer');
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+
+            // --- API Integration (Placeholder - to be activated with a valid API Key) ---
+            const API_KEY = 'YOUR_TMDB_API_KEY_HERE'; 
+            // Note: The below functions are commented out as you requested placeholder movies for now.
+            // If you uncomment and provide an API_KEY, they will fetch real data.
+
+            const fetchMoviesByGenre = async (genreId, genreName) => {
+                if (API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+                    console.warn("Please replace 'YOUR_TMDB_API_KEY_HERE' with your actual TMDb API key to fetch real movie data.");
+                    // Display placeholder movies if no API key is set
+                    displayPlaceholderMovies(genreName); 
+                    genreTitle.textContent = `Tollywood ${genreName} Movies`;
+                    return;
+                }
+
+                const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&with_original_language=te&sort_by=popularity.desc`;
+                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Loading real movies for ' + genreName + '...</p>';
+                genreTitle.textContent = `Tollywood ${genreName} Movies`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
+                    displayMovies(data.results, genreName); // Pass genreName for consistent title
+                } catch (error) {
+                    console.error('There was a problem fetching the movies:', error);
+                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Sorry, we could not load the movies for ' + genreName + ' at this time. Please check your API key and network connection.</p>';
+                }
+            };
+
+            const displayMovies = (movies, currentGenreName) => {
+                moviesContainer.innerHTML = '';
+                if (movies.length === 0) {
+                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">No real movies found for ' + currentGenreName + '.</p>';
+                }
+                movies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.classList.add('card');
+                    const imagePath = movie.poster_path ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : 'https://via.placeholder.com/300x450.png?text=No+Image+Found';
+                    const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
+                    
+                    movieCard.innerHTML = `
+                        <img src="${imagePath}" alt="${movie.title} Poster">
+                        <div class="info">
+                            <h3>${movie.title}</h3>
+                            <p>⭐ ${rating}</p>
+                        </div>
+                    `;
+                    moviesContainer.appendChild(movieCard);
+                });
+            };
+
+            const displayPlaceholderMovies = (currentGenreName) => {
+                moviesContainer.innerHTML = ''; // Clear existing content
+                genreTitle.textContent = `Tollywood ${currentGenreName} Movies`;
+                for (let i = 1; i <= 10; i++) {
+                    const movieCard = document.createElement('div');
+                    movieCard.classList.add('card');
+                    movieCard.innerHTML = `
+                        <img src="https://via.placeholder.com/300x450.png?text=${currentGenreName}+Film+${i}" alt="${currentGenreName} Film ${i} Poster">
+                        <div class="info">
+                            <h3>${currentGenreName} Film ${i}</h3>
+                            <p>⭐ ${Math.floor(Math.random() * 20 + 70) / 10}</p>
+                        </div>
+                    `;
+                    moviesContainer.appendChild(movieCard);
+                }
+            };
+
+            const handleGenreClick = (event) => {
+                event.preventDefault();
+
+                // Remove active class from all genre links
+                genreLinks.forEach(link => link.classList.remove('active'));
+
+                // Add active class to the clicked genre link
+                const clickedLink = event.target;
+                clickedLink.classList.add('active');
+
+                const genreId = clickedLink.dataset.genreId;
+                const genreName = clickedLink.dataset.genreName;
+
+                // Update the URL to reflect the active genre (optional, but good for bookmarking/sharing)
+                const newUrl = `${window.location.pathname}?genreId=${genreId}&genreName=${genreName}`;
+                window.history.pushState({ path: newUrl }, '', newUrl);
+
+                // If you have a valid API_KEY, uncomment fetchMoviesByGenre to get real data
+                // Otherwise, display placeholders
+                // fetchMoviesByGenre(genreId, genreName); 
+                displayPlaceholderMovies(genreName); // Using placeholders for now
+            };
+
+            genreLinks.forEach(link => {
+                link.addEventListener('click', handleGenreClick);
+            });
+
+            // Initial load check for URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialGenreId = urlParams.get('genreId');
+            const initialGenreName = urlParams.get('genreName');
+
+            if (initialGenreId && initialGenreName) {
+                const initialLink = document.querySelector(`a[data-genre-id="${initialGenreId}"]`);
+                if (initialLink) {
+                    initialLink.classList.add('active');
+                    // fetchMoviesByGenre(initialGenreId, initialGenreName); // Uncomment for API
+                    displayPlaceholderMovies(initialGenreName); // Using placeholders
+                }
+            } else {
+                // Default view: Highlight 'Action' and show placeholders for it
+                const defaultGenreLink = document.querySelector('a[data-genre-id="28"]'); // Default to Action
+                if (defaultGenreLink) {
+                    defaultGenreLink.classList.add('active');
+                    // fetchMoviesByGenre('28', 'Action'); // Uncomment for API
+                    displayPlaceholderMovies('Action'); // Using placeholders
+                }
+            }
+            
+            // Search functionality still redirects to the main page
+            const performSearch = () => {
+                const query = searchInput.value;
+                if (query.trim() !== '') {
+                    window.location.href = `index.html?searchQuery=${encodeURIComponent(query)}`;
+                }
+            };
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+    </script> -->
+</body>
+</html>

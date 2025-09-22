@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieZone - Explore Genres</title>
+    <style>
+        :root {
+            --bg-1: #0B0F13;
+            --bg-2: #0F1720;
+            --accent: #E50914; /* Main Red */
+            --secondary-accent-blue: #87CEEB; /* New Sky Blue */
+            --tertiary-accent-gold: #FFD700; /* New Soft Gold */
+            --card: rgba(255, 255, 255, 0.03);
+            --muted: #9AA4AD;
+            --text: #E0E0E0; /* Updated a slightly darker white for contrast */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            color: var(--text);
+            background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.55) 100%), url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h10v10H0zM20 20h10v10H20zM40 40h10v10H40zM60 60h10v10H60zM80 80h10v10H80z" fill="rgba(255,255,255,0.02)" /></svg>');
+            mix-blend-mode: multiply;
+            opacity: 0.8;
+        }
+
+        header {
+            background: rgba(10, 12, 14, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+        }
+
+        header h1 {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #ccc;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+        
+        nav a.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 2px;
+        }
+
+        nav a:not(.active):hover {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease, color 0.3s ease;
+        }
+
+        nav button:hover {
+            transform: translateY(-2px);
+            color: var(--accent);
+        }
+        
+        .search-container-header {
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-container-header input {
+            padding: 8px 12px;
+            border: 1px solid #333;
+            background: #1a1a1a;
+            color: var(--text);
+            border-radius: 5px;
+            margin-right: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .search-container-header button {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .search-container-header button:hover {
+            background: #b20710;
+        }
+
+        main {
+            display: flex;
+            padding: 20px 30px 60px;
+            gap: 40px;
+        }
+        
+        .genre-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background: var(--card);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            height: fit-content;
+        }
+        
+        .genre-list {
+            list-style: none;
+        }
+        
+        .genre-list li {
+            margin-bottom: 4px;
+        }
+
+        .genre-list a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--muted);
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        
+        .genre-list a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+        
+        .genre-list a.active {
+            background: var(--accent);
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex-grow: 1;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--accent);
+            padding-left: 1rem;
+        }
+
+        .movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            overflow: hidden;
+            width: 180px;
+            flex-grow: 1;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.7); 
+        }
+
+        .card img {
+            width: 100%;
+            display: block;
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .card .info {
+            padding: 15px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--tertiary-accent-gold); /* Gold for rating */
+        }
+
+        footer {
+            background: #111;
+            text-align: center;
+            padding: 20px;
+            color: #aaa;
+        }
+        
+        /* Modal Popup Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s;
+        }
+
+        .modal-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-2);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 900px; /* Increased max-width for more content */
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column; /* Start with column for name at top */
+            gap: 20px;
+        }
+
+        .modal-content .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--muted);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-content .close-button:hover {
+            color: var(--secondary-accent-blue);
+        }
+
+        .modal-movie-title {
+            font-size: 2.5rem; /* Larger title for prominence */
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+
+        .modal-body {
+            display: flex;
+            gap: 25px;
+            align-items: flex-start; /* Align content at the top */
+        }
+
+        .modal-trailer {
+            flex: 1; /* Trailer takes available space */
+            min-width: 300px; /* Minimum width for trailer */
+            max-width: 50%; /* Max half width */
+        }
+
+        .modal-trailer iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Maintain aspect ratio for video */
+            border-radius: 8px;
+            border: none;
+        }
+
+        .modal-info {
+            flex: 1; /* Info takes available space */
+            max-width: 50%; /* Max half width */
+        }
+
+        .modal-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--secondary-accent-blue);
+        }
+
+        .modal-info p {
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .modal-info .rating {
+            font-size: 1.2rem;
+            color: var(--tertiary-accent-gold);
+            margin-bottom: 15px;
+        }
+        
+        .modal-info .ott-platforms span {
+            display: inline-block;
+            background: #E0E0E0;
+            color: var(--accent);
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .similar-movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: flex-start;
+        }
+
+        .similar-movie-card {
+            width: 100px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .similar-movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        .similar-movie-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .similar-movie-card .info {
+            padding: 8px 0;
+        }
+
+        .similar-movie-card h4 {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 20px;
+            }
+            .modal-movie-title {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            .modal-body {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .modal-trailer,
+            .modal-info {
+                max-width: 100%; /* Full width on smaller screens */
+                min-width: unset;
+                width: 100%;
+            }
+            .modal-info h3 {
+                margin-top: 20px; /* Space between trailer and info */
+            }
+            .modal-info .ott-platforms {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px 20px;
+            }
+
+            .search-container-header {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .search-container-header input,
+            .search-container-header button {
+                width: 48%;
+            }
+            
+            main {
+                flex-direction: column;
+                padding: 20px;
+            }
+            .genre-sidebar {
+                width: 100%;
+            }
+            .movies-container {
+                justify-content: center;
+            }
+            .similar-movies-container {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎬 MovieZone</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="genres.html" class="active">Genres</a></li>
+                <li><a href="#">Top Rated</a></li>
+                <li><a href="#">About</a></li>
+                <li>
+                    <div class="search-container-header">
+                        <input type="text" id="searchInput" placeholder="Search...">
+                        <button id="searchButton">Search</button>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <aside class="genre-sidebar">
+            <h3 style="margin-bottom: 10px; color: var(--text);">Explore Genres</h3>
+            <ul class="genre-list" id="genreList">
+                <li><a href="#" data-genre-name="Action">Action</a></li>
+                <li><a href="#" data-genre-name="Romance">Romance</a></li>
+                <li><a href="#" data-genre-name="Comedy">Comedy</a></li>
+                <li><a href="#" data-genre-name="Drama">Drama</a></li>
+                <li><a href="#" data-genre-name="Thriller">Thriller</a></li>
+                <li><a href="#" data-genre-name="Horror">Horror</a></li>
+                <li><a href="#" data-genre-name="Mystery">Mystery</a></li>
+                <li><a href="#" data-genre-name="Crime">Crime</a></li>
+                <li><a href="#" data-genre-name="Family">Family</a></li>
+                <li><a href="#" data-genre-name="Historical">Historical</a></li>
+                <li><a href="#" data-genre-name="War">War</a></li>
+                <li><a href="#" data-genre-name="Fantasy">Fantasy</a></li>
+                <li><a href="#" data-genre-name="Documentary">Documentary</a></li>
+                <li><a href="#" data-genre-name="TV Movie">TV Movie</a></li>
+            </ul>
+        </aside>
+
+        <section class="main-content">
+            <h2 class="section-title" id="genreTitle">Tollywood Action Movies</h2>
+            <div id="moviesContainer" class="movies-container">
+                
+                </div>
+        </section>
+    </main>
+
+    <footer>
+        © 2025 MovieZone. All Rights Reserved.
+    </footer>
+    
+    <div id="movie-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-button" id="closeModalButton">×</button>
+            <h2 id="modal-movie-title" class="modal-movie-title"></h2>
+            <div class="modal-body">
+                <div class="modal-trailer">
+                    <iframe id="modal-trailer-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="modal-info">
+                    <h3>Summary</h3>
+                    <p id="modal-plot"></p>
+                    <p id="modal-rating" class="rating"></p>
+                    <h3>Where to Watch</h3>
+                    <div id="modal-ott-platforms" class="ott-platforms">
+                        
+                    </div>
+                </div>
+            </div>
+
+            <div class="similar-movies-section">
+                <h3>Similar Movies</h3>
+                <div id="similar-movies-container" class="similar-movies-container">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const genreList = document.getElementById('genreList');
+            const genreLinks = genreList.querySelectorAll('a');
+            const genreTitle = document.getElementById('genreTitle');
+            const moviesContainer = document.getElementById('moviesContainer');
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            
+            // Modal elements
+            const movieModal = document.getElementById('movie-modal');
+            const modalMovieTitle = document.getElementById('modal-movie-title');
+            const modalTrailerIframe = document.getElementById('modal-trailer-iframe');
+            const modalPlot = document.getElementById('modal-plot');
+            const modalRating = document.getElementById('modal-rating');
+            const modalOttPlatforms = document.getElementById('modal-ott-platforms');
+            const closeModalButton = document.getElementById('closeModalButton');
+            const similarMoviesContainer = document.getElementById('similar-movies-container');
+
+            // Hardcoded movie data (with trailer IDs and OTT platforms)
+            const moviesByGenre = {
+                "Action": [
+                    { 
+                        title: "Baahubali: The Beginning", 
+                        rating: 8.1, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Baahubali:+The+Beginning", 
+                        plot: "In ancient India, an adventurous and daring man becomes embroiled in a longstanding feud between two warring factions. As he uncovers his past, he realizes his destiny is to reclaim his rightful place on the throne.",
+                        trailerId: "G62C8gR5p4Y",
+                        ottPlatforms: ["Disney+ Hotstar", "Amazon Prime Video"],
+                        similarMovies: ["Sye Raa Narasimha Reddy", "Sarrainodu", "Arjun Reddy"]
+                    },
+                    { 
+                        title: "Rangasthalam", 
+                        rating: 8.4, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Rangasthalam", 
+                        plot: "A sound engineer with a hearing impairment fights against the tyrannical rule of a corrupt politician in his village. He rallies the villagers to take a stand, leading to a dramatic turn of events.",
+                        trailerId: "s4R29h9aN80",
+                        ottPlatforms: ["Amazon Prime Video", "JioCinema"],
+                        similarMovies: ["S/O Satyamurthy", "Arjun Reddy", "Fidaa"]
+                    },
+                    { 
+                        title: "Eega", 
+                        rating: 7.7, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Eega", 
+                        plot: "After being brutally murdered, a man is reincarnated as a housefly. He seeks revenge on the man who killed him to stop his love interest from falling into the wrong hands.",
+                        trailerId: "NswbC8Bq7F4",
+                        ottPlatforms: ["Disney+ Hotstar"],
+                        similarMovies: ["Sye Raa Narasimha Reddy", "Ala Vaikunthapurramuloo", "Nannaku Prematho"]
+                    },
+                    { 
+                        title: "Arjun Reddy", 
+                        rating: 8.1, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Arjun+Reddy", 
+                        plot: "A brilliant, short-tempered surgeon with a drinking problem spirals into self-destruction after his girlfriend is forced to marry another man.",
+                        trailerId: "GHy3b20uE-c",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Rangasthalam", "Jersey", "Majili"]
+                    },
+                    { 
+                        title: "Bharat Ane Nenu", 
+                        rating: 7.8, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Bharat+Ane+Nenu", 
+                        plot: "An idealistic young graduate returns to India to take charge of his state as Chief Minister after his father's sudden death. He faces deep-rooted corruption and political challenges while implementing radical changes.",
+                        trailerId: "BqY5_fQ_b1c",
+                        ottPlatforms: ["Amazon Prime Video", "Zee5"],
+                        similarMovies: ["Sye Raa Narasimha Reddy", "Eega", "Ala Vaikunthapurramuloo"]
+                    },
+                    { 
+                        title: "Ala Vaikunthapurramuloo", 
+                        rating: 7.6, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Ala+Vaikunthapurramuloo", 
+                        plot: "A young man, switched at birth with a wealthy baby, grows up in a middle-class family. He struggles for recognition from his father, not knowing his real parents are billionaires.",
+                        trailerId: "HwG6g1pCYo8",
+                        ottPlatforms: ["Netflix", "Sun NXT"],
+                        similarMovies: ["F2 – Fun and Frustration", "Gaddalakonda Ganesh", "Sarrainodu"]
+                    },
+                    { 
+                        title: "Aravinda Sametha Veera Raghava", 
+                        rating: 7.1, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Aravinda+Sametha+Veera+Raghava", 
+                        plot: "After a violent gang war claims the life of his father, a young man from a faction-ridden village decides to end the bloodshed by moving to the city and changing his violent ways.",
+                        trailerId: "148g2yN-z3U",
+                        ottPlatforms: ["Zee5"],
+                        similarMovies: ["Baahubali: The Beginning", "Sye Raa Narasimha Reddy", "Rangasthalam"]
+                    },
+                    { 
+                        title: "Nannaku Prematho", 
+                        rating: 7.5, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Nannaku+Prematho", 
+                        plot: "A smart MI6 agent embarks on a mission to bankrupt a powerful billionaire. He uses his intellect to outwit the villain, all while dealing with personal family matters.",
+                        trailerId: "Y8hO7L0P620",
+                        ottPlatforms: ["Sun NXT"],
+                        similarMovies: ["Kshanam", "Evaru", "Mallesham"]
+                    },
+                    { 
+                        title: "Sye Raa Narasimha Reddy", 
+                        rating: 6.8, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Sye+Raa+Narasimha+Reddy", 
+                        plot: "A historical epic based on the life of Uyyalawada Narasimha Reddy, a freedom fighter who led the first rebellion against the British East India Company.",
+                        trailerId: "u4mO_Y6aW4Y",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Baahubali: The Beginning", "Aravinda Sametha Veera Raghava", "Sarrainodu"]
+                    },
+                    { 
+                        title: "Sarrainodu", 
+                        rating: 7.3, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Sarrainodu", 
+                        plot: "An aimless, hot-headed young man gets into conflicts with a dangerous politician's son. His fights for justice lead to a thrilling showdown between them.",
+                        trailerId: "F1W2d3pT8qE",
+                        ottPlatforms: ["Aha", "Sun NXT"],
+                        similarMovies: ["Aravinda Sametha Veera Raghava", "Bharat Ane Nenu", "Baahubali: The Beginning"]
+                    }
+                ],
+                "Romance": [
+                    { 
+                        title: "Mahanati", 
+                        rating: 8.5, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Mahanati", 
+                        plot: "A touching biographical drama about the life of legendary actress Savitri, highlighting her rise to fame and her tragic personal life.",
+                        trailerId: "P_z-K6uH_F0",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Jersey", "Sita Ramam", "Oh! Baby"]
+                    },
+                    { 
+                        title: "Fidaa", 
+                        rating: 7.9, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Fidaa", 
+                        plot: "A bubbly village girl falls in love with a charming NRI doctor, but their different lifestyles and clashing views on family lead to complications.",
+                        trailerId: "iO0N-7_e_qM",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Geetha Govindam", "Ninnu Kori", "Pelli Choopulu"]
+                    },
+                    { 
+                        title: "Geetha Govindam", 
+                        rating: 7.7, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Geetha+Govindam", 
+                        plot: "A young man’s crush on a beautiful woman turns into a series of unfortunate events after he's caught in a compromising situation with her sister.",
+                        trailerId: "vB-XQ2Fw5vE",
+                        ottPlatforms: ["Amazon Prime Video", "Zee5"],
+                        similarMovies: ["Fidaa", "Ninnu Kori", "Pelli Choopulu"]
+                    },
+                    { 
+                        title: "Ninnu Kori", 
+                        rating: 7.6, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Ninnu+Kori", 
+                        plot: "A man and woman who were in a relationship meet years later, leading to a complex and emotional journey as they try to navigate their past and present feelings.",
+                        trailerId: "W0jS8XG0gH8",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Geetha Govindam", "Fidaa", "Majili"]
+                    },
+                    { 
+                        title: "Pelli Choopulu", 
+                        rating: 8.3, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Pelli+Choopulu", 
+                        plot: "A lighthearted and modern take on arranged marriage, where a career-oriented girl and a lazy guy with entrepreneurial dreams start a food truck business together.",
+                        trailerId: "z22jI97mJ2M",
+                        ottPlatforms: ["Netflix", "Hotstar"],
+                        similarMovies: ["Geetha Govindam", "Fidaa", "Oh! Baby"]
+                    },
+                    { 
+                        title: "Sita Ramam", 
+                        rating: 8.6, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Sita+Ramam", 
+                        plot: "In 1964, an Indian Army officer writes a letter to his lady love, but when he gets a reply from her, he discovers that the address is from Pakistan.",
+                        trailerId: "yWlK_tK1eWc",
+                        ottPlatforms: ["Amazon Prime Video", "Disney+ Hotstar"],
+                        similarMovies: ["Jersey", "Mahanati", "Majili"]
+                    },
+                    { 
+                        title: "Khushi", 
+                        rating: 7.5, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Khushi", 
+                        plot: "Two college students, after a series of hilarious misunderstandings, fall in love and try to win the approval of their families.",
+                        trailerId: "c2M3b5h9k1L",
+                        ottPlatforms: ["Sun NXT"],
+                        similarMovies: ["Fidaa", "Nuvvu Naaku Nachav", "Geetha Govindam"]
+                    },
+                    { 
+                        title: "Majili", 
+                        rating: 7.4, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Majili", 
+                        plot: "A former cricketer, traumatized by his past, is forced into a loveless marriage with a woman who adores him. Their relationship gradually evolves into a deep bond.",
+                        trailerId: "P8t8q9U0o7Y",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Jersey", "Sita Ramam", "Arjun Reddy"]
+                    },
+                    { 
+                        title: "Jersey", 
+                        rating: 8.6, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Jersey", 
+                        plot: "A talented but failed cricketer tries to make a comeback in his late 30s to fulfill a promise to his son, inspiring his family and fans along the way.",
+                        trailerId: "Aj-LwE-j82o",
+                        ottPlatforms: ["Netflix", "Zee5"],
+                        similarMovies: ["Mahanati", "Sita Ramam", "Majili"]
+                    },
+                    { 
+                        title: "RX 100", 
+                        rating: 7.1, 
+                        poster: "https://via.placeholder.com/300x450.png?text=RX+100", 
+                        plot: "The intense love story between a small-town boy and the daughter of a local politician, leading to a heartbreaking and violent conclusion.",
+                        trailerId: "B7S6d2f3g4H",
+                        ottPlatforms: ["Aha"],
+                        similarMovies: ["Arjun Reddy", "Fidaa", "Ninnu Kori"]
+                    }
+                ],
+                "Comedy": [
+                    { 
+                        title: "Jathi Ratnalu", 
+                        rating: 7.5, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Jathi+Ratnalu", 
+                        plot: "Three friends from a small town get entangled in a hilarious murder mystery in the city, leading to a series of comedic misadventures.",
+                        trailerId: "r-9B4w_t2lE",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["F2 – Fun and Frustration", "Pelli Choopulu", "Oh! Baby"]
+                    },
+                    { 
+                        title: "Pilla Zamindar", 
+                        rating: 8.0, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Pilla+Zamindar", 
+                        plot: "A spoiled young man inherits his grandfather's fortune, but with a condition: he must live in his ancestral village for a year and finish his graduation.",
+                        trailerId: "G7h0j1k2l3M",
+                        ottPlatforms: ["Disney+ Hotstar"],
+                        similarMovies: ["Oh! Baby", "Bhale Bhale Magadivoy", "Nuvvu Naaku Nachav"]
+                    },
+                    { 
+                        title: "Nuvvu Naaku Nachav", 
+                        rating: 8.1, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Nuvvu+Naaku+Nachav", 
+                        plot: "A young man visiting a family for a marriage proposal falls in love with the bride’s sister, leading to chaos and comical situations.",
+                        trailerId: "N8o9p0q1r2S",
+                        ottPlatforms: ["Sun NXT"],
+                        similarMovies: ["Geetha Govindam", "Pelli Choopulu", "F2 – Fun and Frustration"]
+                    },
+                    { 
+                        title: "Venkatesh", 
+                        rating: 8.2, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Venkatesh", 
+                        plot: "A light-hearted romantic comedy about a young man who tries to win over a girl by pretending to be someone he's not.",
+                        trailerId: "T3u4v5w6x7Y",
+                        ottPlatforms: ["Zee5"],
+                        similarMovies: ["S/O Satyamurthy", "Nuvvu Naaku Nachav", "Chalo"]
+                    },
+                    { 
+                        title: "Bhale Bhale Magadivoy", 
+                        rating: 7.7, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Bhale+Bhale+Magadivoy", 
+                        plot: "A botanist with a severe short-term memory problem falls in love. He has to overcome his memory loss to keep his relationship a secret from the girl's family.",
+                        trailerId: "L9k8j7h6g5F",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["F2 – Fun and Frustration", "Pelli Choopulu", "Oh! Baby"]
+                    },
+                    { 
+                        title: "Evaru", 
+                        rating: 7.8, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Evaru", 
+                        plot: "A disgraced cop is hired by a woman to clear her name in the murder of a high-ranking official. Their investigation reveals a dark web of secrets and betrayal.",
+                        trailerId: "C1b2n3m4a5S",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Kshanam", "Nannaku Prematho", "Mallesham"]
+                    },
+                    { 
+                        title: "F2 – Fun and Frustration", 
+                        rating: 6.9, 
+                        poster: "https://via.placeholder.com/300x450.png?text=F2+%E2%80%93+Fun+and+Frustration", 
+                        plot: "Two brothers-in-law, frustrated with their wives, decide to take a break and go to Europe. Their adventure is full of hilarious misadventures and lessons about marriage.",
+                        trailerId: "E9d8c7b6a5Z",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Jathi Ratnalu", "Pelli Choopulu", "Bhale Bhale Magadivoy"]
+                    },
+                    { 
+                        title: "Sammohanam", 
+                        rating: 7.2, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Sammohanam", 
+                        plot: "A young man who hates movies and actors falls in love with an actress who comes to his village for a film shoot.",
+                        trailerId: "X0y1z2a3b4C",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Geetha Govindam", "Fidaa", "Ninnu Kori"]
+                    },
+                    { 
+                        title: "Chalo", 
+                        rating: 7.4, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Chalo", 
+                        plot: "A college student moves to a town divided by two warring factions. He falls in love with a girl from the opposite side and tries to unite the factions.",
+                        trailerId: "V5u4t3s2r1Q",
+                        ottPlatforms: ["Aha"],
+                        similarMovies: ["Venkatesh", "Rangasthalam", "Bhale Bhale Magadivoy"]
+                    },
+                    { 
+                        title: "S/O Satyamurthy", 
+                        rating: 7.2, 
+                        poster: "https://via.placeholder.com/300x450.png?text=S%2FO+Satyamurthy", 
+                        plot: "A kind-hearted young man loses all his wealth after his father's sudden death. He embarks on a journey to clear his father's name and reclaim his family's honor.",
+                        trailerId: "O9p8q7r6s5T",
+                        ottPlatforms: ["JioCinema"],
+                        similarMovies: ["Aravinda Sametha Veera Raghava", "Bharat Ane Nenu", "Venkatesh"]
+                    }
+                ],
+                "Drama": [
+                    { 
+                        title: "Mahanati", 
+                        rating: 8.5, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Mahanati", 
+                        plot: "A touching biographical drama about the life of legendary actress Savitri, highlighting her rise to fame and her tragic personal life.",
+                        trailerId: "P_z-K6uH_F0",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Jersey", "Sita Ramam", "Oh! Baby"]
+                    },
+                    { 
+                        title: "Jersey", 
+                        rating: 8.6, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Jersey", 
+                        plot: "A talented but failed cricketer tries to make a comeback in his late 30s to fulfill a promise to his son, inspiring his family and fans along the way.",
+                        trailerId: "Aj-LwE-j82o",
+                        ottPlatforms: ["Netflix", "Zee5"],
+                        similarMovies: ["Mahanati", "Sita Ramam", "Majili"]
+                    },
+                    { 
+                        title: "Rang De", 
+                        rating: 7.3, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Rang+De", 
+                        plot: "The story of two childhood friends who are always at odds with each other. They eventually get married, and their constant bickering turns into a journey of love.",
+                        trailerId: "D2e3f4g5h6I",
+                        ottPlatforms: ["Zee5"],
+                        similarMovies: ["Geetha Govindam", "Ninnu Kori", "Pelli Choopulu"]
+                    },
+                    { 
+                        title: "Ala Vaikunthapurramuloo", 
+                        rating: 7.6, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Ala+Vaikunthapurramuloo", 
+                        plot: "A young man, switched at birth with a wealthy baby, grows up in a middle-class family. He struggles for recognition from his father, not knowing his real parents are billionaires.",
+                        trailerId: "HwG6g1pCYo8",
+                        ottPlatforms: ["Netflix", "Sun NXT"],
+                        similarMovies: ["F2 – Fun and Frustration", "Gaddalakonda Ganesh", "Sarrainodu"]
+                    },
+                    { 
+                        title: "Gaddalakonda Ganesh", 
+                        rating: 7.1, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Gaddalakonda+Ganesh", 
+                        plot: "A young director decides to make a biopic on a notorious gangster. He meets the gangster, and a series of dramatic events unfolds.",
+                        trailerId: "J6k7l8m9n0O",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Evaru", "Kshanam", "Nannaku Prematho"]
+                    },
+                    { 
+                        title: "Oh! Baby", 
+                        rating: 7.5, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Oh!+Baby", 
+                        plot: "A cranky 70-year-old woman magically transforms into her 24-year-old self after a visit to a photo studio. She gets a second chance to live her life and fulfill her dreams.",
+                        trailerId: "K1l2m3n4o5P",
+                        ottPlatforms: ["Netflix"],
+                        similarMovies: ["Mahanati", "Jersey", "Pelli Choopulu"]
+                    },
+                    { 
+                        title: "Shatamanam Bhavati", 
+                        rating: 7.2, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Shatamanam+Bhavati", 
+                        plot: "A grandfather fakes a family feud to bring his children, who live abroad, together for a festive occasion. His plan works, but it also uncovers many hidden emotions.",
+                        trailerId: "Q6r7s8t9u0V",
+                        ottPlatforms: ["Aha"],
+                        similarMovies: ["Sita Ramam", "Ala Vaikunthapurramuloo", "Mahanati"]
+                    },
+                    { 
+                        title: "Krishna and His Leela", 
+                        rating: 7.7, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Krishna+and+His+Leela", 
+                        plot: "A young man finds himself in a complicated relationship triangle, navigating love, life, and modern romance with two different women.",
+                        trailerId: "W1x2y3z4a5B",
+                        ottPlatforms: ["Netflix"],
+                        similarMovies: ["Pelli Choopulu", "Geetha Govindam", "Fidaa"]
+                    },
+                    { 
+                        title: "Kshanam", 
+                        rating: 7.9, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Kshanam", 
+                        plot: "A man returns to India after receiving a call from his ex-girlfriend, who asks him to help find her kidnapped daughter. The man embarks on a dangerous mission to uncover the truth.",
+                        trailerId: "C6d7e8f9g0H",
+                        ottPlatforms: ["Amazon Prime Video"],
+                        similarMovies: ["Evaru", "Nannaku Prematho", "Mallesham"]
+                    },
+                    { 
+                        title: "Mallesham", 
+                        rating: 8.3, 
+                        poster: "https://via.placeholder.com/300x450.png?text=Mallesham", 
+                        plot: "Based on a true story, a young man from a small village invents a machine to automate the process of weaving, to ease the burden on his mother.",
+                        trailerId: "I1j2k3l4m5N",
+                        ottPlatforms: ["Netflix"],
+                        similarMovies: ["Kshanam", "Evaru", "Nannaku Prematho"]
+                    }
+                ],
+            };
+            
+            // Helper function to find a movie by its title
+            const findMovieByTitle = (title) => {
+                for (const genre in moviesByGenre) {
+                    const movie = moviesByGenre[genre].find(m => m.title === title);
+                    if (movie) return movie;
+                }
+                return null;
+            };
+
+
+            const displayMoviesForGenre = (genreName) => {
+                moviesContainer.innerHTML = ''; // Clear previous movies
+                genreTitle.textContent = `Tollywood ${genreName} Movies`;
+                const movies = moviesByGenre[genreName] || [];
+
+                if (movies.length === 0) {
+                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">No movies found for this genre.</p>';
+                    return;
+                }
+
+                movies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.classList.add('card');
+                    
+                    movieCard.innerHTML = `
+                        <img src="${movie.poster}" alt="${movie.title} Poster">
+                        <div class="info">
+                            <h3>${movie.title}</h3>
+                            <p>⭐ ${movie.rating}</p>
+                        </div>
+                    `;
+                    // Add a click event listener to each card
+                    movieCard.addEventListener('click', () => showModal(movie));
+                    
+                    moviesContainer.appendChild(movieCard);
+                });
+            };
+
+            const showModal = (movie) => {
+                modalMovieTitle.textContent = movie.title;
+                
+                if (movie.trailerId) {
+                    modalTrailerIframe.src = `https://www.youtube.com/embed/${movie.trailerId}?autoplay=1&rel=0`;
+                } else {
+                    modalTrailerIframe.src = ``;
+                }
+                
+                modalPlot.textContent = movie.plot;
+                modalRating.textContent = `⭐ ${movie.rating}`;
+                
+                modalOttPlatforms.innerHTML = '';
+                if (movie.ottPlatforms && movie.ottPlatforms.length > 0) {
+                    movie.ottPlatforms.forEach(platform => {
+                        const span = document.createElement('span');
+                        span.textContent = platform;
+                        modalOttPlatforms.appendChild(span);
+                    });
+                } else {
+                    modalOttPlatforms.innerHTML = '<span>Not available on OTT platforms.</span>';
+                }
+
+                similarMoviesContainer.innerHTML = '';
+                if (movie.similarMovies && movie.similarMovies.length > 0) {
+                    movie.similarMovies.forEach(similarTitle => {
+                        const similarMovie = findMovieByTitle(similarTitle);
+                        if (similarMovie) {
+                            const similarCard = document.createElement('div');
+                            similarCard.classList.add('similar-movie-card');
+                            similarCard.innerHTML = `
+                                <img src="${similarMovie.poster}" alt="${similarMovie.title} Poster">
+                                <div class="info">
+                                    <h4>${similarMovie.title}</h4>
+                                </div>
+                            `;
+                            similarCard.addEventListener('click', () => showModal(similarMovie));
+                            similarMoviesContainer.appendChild(similarCard);
+                        }
+                    });
+                }
+                
+                movieModal.classList.add('visible');
+            };
+
+            const closeModal = () => {
+                movieModal.classList.remove('visible');
+                modalTrailerIframe.src = ``;
+            };
+
+            const handleGenreClick = (event) => {
+                event.preventDefault();
+
+                genreLinks.forEach(link => link.classList.remove('active'));
+
+                const clickedLink = event.target;
+                clickedLink.classList.add('active');
+
+                const genreName = clickedLink.dataset.genreName;
+                displayMoviesForGenre(genreName);
+            };
+
+            genreLinks.forEach(link => {
+                link.addEventListener('click', handleGenreClick);
+            });
+            closeModalButton.addEventListener('click', closeModal);
+            movieModal.addEventListener('click', (event) => {
+                if (event.target.classList.contains('modal-overlay')) {
+                    closeModal();
+                }
+            });
+            
+            const initialLink = document.querySelector('a[data-genre-name="Action"]');
+            if (initialLink) {
+                initialLink.classList.add('active');
+                displayMoviesForGenre('Action');
+            }
+
+            const performSearch = () => {
+                const query = searchInput.value;
+                if (query.trim() !== '') {
+                    window.location.href = `index.html?searchQuery=${encodeURIComponent(query)}`;
+                }
+            };
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
