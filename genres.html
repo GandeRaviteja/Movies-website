@@ -166,10 +166,9 @@
             color: var(--text);
         }
         
-        /* Active state for genre links */
         .genre-list a.active {
-            background: var(--accent); /* Red background */
-            color: var(--text); /* White text for contrast */
+            background: var(--accent); 
+            color: var(--text);
             font-weight: 600;
         }
 
@@ -182,6 +181,20 @@
             margin-bottom: 1.5rem;
             border-left: 4px solid var(--accent);
             padding-left: 1rem;
+        }
+        
+        #sortButton {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        #sortButton:hover {
+            background: #b20710;
         }
 
         .movies-container {
@@ -206,7 +219,6 @@
 
         .card:hover {
             transform: scale(1.05);
-            /* Red shadow on hover */
             box-shadow: 0 0 20px rgba(229, 9, 20, 0.7); 
         }
 
@@ -271,6 +283,10 @@
             .movies-container {
                 justify-content: center;
             }
+            .section-title {
+                font-size: 1.5rem;
+                padding-left: 0.5rem;
+            }
         }
     </style>
 </head>
@@ -316,81 +332,12 @@
         </aside>
 
         <section class="main-content">
-            <h2 class="section-title" id="genreTitle">Explore Tollywood Genres</h2>
-            <div id="moviesContainer" class="movies-container">
-                
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+1" alt="Action Film 1 Poster">
-                    <div class="info">
-                        <h3>Action Film 1</h3>
-                        <p>⭐ 8.5</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+2" alt="Action Film 2 Poster">
-                    <div class="info">
-                        <h3>Action Film 2</h3>
-                        <p>⭐ 7.8</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+3" alt="Action Film 3 Poster">
-                    <div class="info">
-                        <h3>Action Film 3</h3>
-                        <p>⭐ 9.1</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+4" alt="Action Film 4 Poster">
-                    <div class="info">
-                        <h3>Action Film 4</h3>
-                        <p>⭐ 6.9</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+5" alt="Action Film 5 Poster">
-                    <div class="info">
-                        <h3>Action Film 5</h3>
-                        <p>⭐ 8.2</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+6" alt="Action Film 6 Poster">
-                    <div class="info">
-                        <h3>Action Film 6</h3>
-                        <p>⭐ 7.5</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+7" alt="Action Film 7 Poster">
-                    <div class="info">
-                        <h3>Action Film 7</h3>
-                        <p>⭐ 8.8</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+8" alt="Action Film 8 Poster">
-                    <div class="info">
-                        <h3>Action Film 8</h3>
-                        <p>⭐ 7.1</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+9" alt="Action Film 9 Poster">
-                    <div class="info">
-                        <h3>Action Film 9</h3>
-                        <p>⭐ 9.0</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <img src="https://via.placeholder.com/300x450.png?text=Action+Film+10" alt="Action Film 10 Poster">
-                    <div class="info">
-                        <h3>Action Film 10</h3>
-                        <p>⭐ 7.6</p>
-                    </div>
-                </div>
-                
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <h2 class="section-title" id="genreTitle">Explore Tollywood Genres</h2>
+                <button id="sortButton">Sort: Latest to Oldest</button>
             </div>
+            <div id="moviesContainer" class="movies-container">
+                </div>
         </section>
     </main>
 
@@ -399,141 +346,34 @@
     </footer>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const API_KEY = '6e82f9e86404f4565269c0749267f41c';
-        const genreList = document.getElementById('genreList');
-        const genreLinks = genreList.querySelectorAll('a');
-        const genreTitle = document.getElementById('genreTitle');
-        const moviesContainer = document.getElementById('moviesContainer');
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-
-        const fetchMoviesByGenre = async (genreId, genreName) => {
-            if (API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
-                console.warn("Please replace 'YOUR_TMDB_API_KEY_HERE' with your actual TMDb API key to fetch real movie data.");
-                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Please provide a valid API key to load movies.</p>';
-                return;
-            }
-
-            const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&with_original_language=te&sort_by=popularity.desc`;
-            
-            moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Loading real movies...</p>';
-            genreTitle.textContent = `Tollywood ${genreName} Movies`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                displayMovies(data.results, genreName);
-            } catch (error) {
-                console.error('There was a problem fetching the movies:', error);
-                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Sorry, we could not load the movies for ' + genreName + ' at this time. Please check your API key and network connection.</p>';
-            }
-        };
-
-        const displayMovies = (movies, currentGenreName) => {
-            moviesContainer.innerHTML = '';
-            if (movies.length === 0) {
-                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">No movies found for ' + currentGenreName + '.</p>';
-            }
-            movies.forEach(movie => {
-                const movieCard = document.createElement('div');
-                movieCard.classList.add('card');
-                const imagePath = movie.poster_path ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : 'https://via.placeholder.com/300x450.png?text=No+Image+Found';
-                const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
-                
-                movieCard.innerHTML = `
-                    <img src="${imagePath}" alt="${movie.title} Poster">
-                    <div class="info">
-                        <h3>${movie.title}</h3>
-                        <p>⭐ ${rating}</p>
-                    </div>
-                `;
-                moviesContainer.appendChild(movieCard);
-            });
-        };
-
-        const handleGenreClick = (event) => {
-            event.preventDefault();
-
-            genreLinks.forEach(link => link.classList.remove('active'));
-
-            const clickedLink = event.target;
-            clickedLink.classList.add('active');
-
-            const genreId = clickedLink.dataset.genreId;
-            const genreName = clickedLink.dataset.genreName;
-
-            const newUrl = `${window.location.pathname}?genreId=${genreId}&genreName=${genreName}`;
-            window.history.pushState({ path: newUrl }, '', newUrl);
-
-            fetchMoviesByGenre(genreId, genreName);
-        };
-
-        genreLinks.forEach(link => {
-            link.addEventListener('click', handleGenreClick);
-        });
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialGenreId = urlParams.get('genreId');
-        const initialGenreName = urlParams.get('genreName');
-
-        if (initialGenreId && initialGenreName) {
-            const initialLink = document.querySelector(`a[data-genre-id="${initialGenreId}"]`);
-            if (initialLink) {
-                initialLink.classList.add('active');
-                fetchMoviesByGenre(initialGenreId, initialGenreName);
-            }
-        } else {
-            const defaultGenreLink = document.querySelector('a[data-genre-id="28"]');
-            if (defaultGenreLink) {
-                defaultGenreLink.classList.add('active');
-                fetchMoviesByGenre('28', 'Action');
-            }
-        }
-        
-        const performSearch = () => {
-            const query = searchInput.value;
-            if (query.trim() !== '') {
-                window.location.href = `index.html?searchQuery=${encodeURIComponent(query)}`;
-            }
-        };
-        searchButton.addEventListener('click', performSearch);
-        searchInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                performSearch();
-            }
-        });
-    });
-</script>
-<!--     
-    <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // !!! IMPORTANT: Replace 'YOUR_TMDB_API_KEY_HERE' with your actual TMDb API key.
+            const API_KEY = '6e82f9e86404f4565269c0749267f41c'; 
+            
             const genreList = document.getElementById('genreList');
             const genreLinks = genreList.querySelectorAll('a');
             const genreTitle = document.getElementById('genreTitle');
             const moviesContainer = document.getElementById('moviesContainer');
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
+            const sortButton = document.getElementById('sortButton'); 
 
-            // --- API Integration (Placeholder - to be activated with a valid API Key) ---
-            const API_KEY = 'YOUR_TMDB_API_KEY_HERE'; 
-            // Note: The below functions are commented out as you requested placeholder movies for now.
-            // If you uncomment and provide an API_KEY, they will fetch real data.
+            // Set the default sort order to show the latest movies first
+            let currentSortOrder = 'primary_release_date.desc'; 
+            let currentGenreId = '28'; 
+            let currentGenreName = 'Action'; 
 
-            const fetchMoviesByGenre = async (genreId, genreName) => {
-                if (API_KEY === 'YOUR_TMDB_API_KEY_HERE') {
+            const fetchMoviesByGenre = async (genreId, genreName, sortOrder) => {
+                if (API_KEY === 'YOUR_TMDB_API_KEY_HERE' || !API_KEY) {
                     console.warn("Please replace 'YOUR_TMDB_API_KEY_HERE' with your actual TMDb API key to fetch real movie data.");
-                    // Display placeholder movies if no API key is set
-                    displayPlaceholderMovies(genreName); 
-                    genreTitle.textContent = `Tollywood ${genreName} Movies`;
+                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Please provide a valid API key to load movies.</p>';
                     return;
                 }
-
-                const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&with_original_language=te&sort_by=popularity.desc`;
-                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Loading real movies for ' + genreName + '...</p>';
+                
+                // This URL filters by Telugu language and the selected genre, without a vote count minimum
+                const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&with_original_language=te&sort_by=${sortOrder}`;
+                
+                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Loading real movies...</p>';
                 genreTitle.textContent = `Tollywood ${genreName} Movies`;
 
                 try {
@@ -542,7 +382,7 @@
                         throw new Error('Network response was not ok');
                     }
                     const data = await response.json();
-                    displayMovies(data.results, genreName); // Pass genreName for consistent title
+                    displayMovies(data.results, genreName);
                 } catch (error) {
                     console.error('There was a problem fetching the movies:', error);
                     moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Sorry, we could not load the movies for ' + genreName + ' at this time. Please check your API key and network connection.</p>';
@@ -552,7 +392,7 @@
             const displayMovies = (movies, currentGenreName) => {
                 moviesContainer.innerHTML = '';
                 if (movies.length === 0) {
-                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">No real movies found for ' + currentGenreName + '.</p>';
+                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">No movies found for ' + currentGenreName + '.</p>';
                 }
                 movies.forEach(movie => {
                     const movieCard = document.createElement('div');
@@ -571,51 +411,42 @@
                 });
             };
 
-            const displayPlaceholderMovies = (currentGenreName) => {
-                moviesContainer.innerHTML = ''; // Clear existing content
-                genreTitle.textContent = `Tollywood ${currentGenreName} Movies`;
-                for (let i = 1; i <= 10; i++) {
-                    const movieCard = document.createElement('div');
-                    movieCard.classList.add('card');
-                    movieCard.innerHTML = `
-                        <img src="https://via.placeholder.com/300x450.png?text=${currentGenreName}+Film+${i}" alt="${currentGenreName} Film ${i} Poster">
-                        <div class="info">
-                            <h3>${currentGenreName} Film ${i}</h3>
-                            <p>⭐ ${Math.floor(Math.random() * 20 + 70) / 10}</p>
-                        </div>
-                    `;
-                    moviesContainer.appendChild(movieCard);
-                }
-            };
-
             const handleGenreClick = (event) => {
                 event.preventDefault();
 
-                // Remove active class from all genre links
                 genreLinks.forEach(link => link.classList.remove('active'));
-
-                // Add active class to the clicked genre link
                 const clickedLink = event.target;
                 clickedLink.classList.add('active');
 
-                const genreId = clickedLink.dataset.genreId;
-                const genreName = clickedLink.dataset.genreName;
+                currentGenreId = clickedLink.dataset.genreId;
+                currentGenreName = clickedLink.dataset.genreName;
 
-                // Update the URL to reflect the active genre (optional, but good for bookmarking/sharing)
-                const newUrl = `${window.location.pathname}?genreId=${genreId}&genreName=${genreName}`;
+                const newUrl = `${window.location.pathname}?genreId=${currentGenreId}&genreName=${currentGenreName}`;
                 window.history.pushState({ path: newUrl }, '', newUrl);
 
-                // If you have a valid API_KEY, uncomment fetchMoviesByGenre to get real data
-                // Otherwise, display placeholders
-                // fetchMoviesByGenre(genreId, genreName); 
-                displayPlaceholderMovies(genreName); // Using placeholders for now
+                fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
+            };
+            
+            const toggleSortOrder = () => {
+                if (currentSortOrder === 'primary_release_date.desc') {
+                    currentSortOrder = 'vote_average.desc';
+                    sortButton.textContent = 'Sort: Top Rated';
+                } else if (currentSortOrder === 'vote_average.desc') {
+                    currentSortOrder = 'vote_average.asc';
+                    sortButton.textContent = 'Sort: Bottom Rated';
+                } else {
+                    currentSortOrder = 'primary_release_date.desc';
+                    sortButton.textContent = 'Sort: Latest to Oldest';
+                }
+                fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
             };
 
             genreLinks.forEach(link => {
                 link.addEventListener('click', handleGenreClick);
             });
+            
+            sortButton.addEventListener('click', toggleSortOrder);
 
-            // Initial load check for URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const initialGenreId = urlParams.get('genreId');
             const initialGenreName = urlParams.get('genreName');
@@ -624,20 +455,18 @@
                 const initialLink = document.querySelector(`a[data-genre-id="${initialGenreId}"]`);
                 if (initialLink) {
                     initialLink.classList.add('active');
-                    // fetchMoviesByGenre(initialGenreId, initialGenreName); // Uncomment for API
-                    displayPlaceholderMovies(initialGenreName); // Using placeholders
+                    currentGenreId = initialGenreId;
+                    currentGenreName = initialGenreName;
+                    fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
                 }
             } else {
-                // Default view: Highlight 'Action' and show placeholders for it
-                const defaultGenreLink = document.querySelector('a[data-genre-id="28"]'); // Default to Action
+                const defaultGenreLink = document.querySelector('a[data-genre-id="28"]');
                 if (defaultGenreLink) {
                     defaultGenreLink.classList.add('active');
-                    // fetchMoviesByGenre('28', 'Action'); // Uncomment for API
-                    displayPlaceholderMovies('Action'); // Using placeholders
+                    fetchMoviesByGenre('28', 'Action', currentSortOrder);
                 }
             }
             
-            // Search functionality still redirects to the main page
             const performSearch = () => {
                 const query = searchInput.value;
                 if (query.trim() !== '') {
@@ -651,6 +480,6 @@
                 }
             });
         });
-    </script> -->
+    </script>
 </body>
 </html>
