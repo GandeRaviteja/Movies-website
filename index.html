@@ -15,7 +15,7 @@
             --modal-bg: #1a1a1a; /* Darker background for the modal itself */
         }
         [data-theme="light"] {
-            --bg-1: #eef2f6;
+            --bg-1: #eef2;
             --bg-2: #f8fafc;
             --accent: #E50914;
             --card: rgba(0, 0, 0, 0.05);
@@ -59,6 +59,7 @@
             top: 0;
             z-index: 40;
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+            border-bottom: 2px solid var(--accent);
         }
         [data-theme="light"] header {
             background: rgba(255, 255, 255, 0.8);
@@ -792,13 +793,13 @@
 <body>
 
     <header>
-        <h1><a href="main.html" style="text-decoration: none;color:white">🎬 TCB </a></h1>
+        <h1><a href="main.html" style="text-decoration: none;color:rgb(255, 0, 0)">🎬 TCB </a></h1>
         <nav>
             <ul>
                 <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="genres.html">Genres</a></li>
                 <li><a href="toprated.html">Top Rated</a></li>
-                <li><a href="#">About</a></li>
+                <li><a href="about.html">About</a></li>
                 <li class="menu-container">
                     <button id="menu-toggle" aria-label="Toggle menu">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -812,10 +813,6 @@
                         <a href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                             Profile
-                        </a>
-                        <a href="#">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 8.91-1.01L12 2z"></path></svg>
-                            My MovieList
                         </a>
                         
                         <div class="theme-toggle-wrapper">
@@ -1205,14 +1202,14 @@
         
         // --- Search Handler ---
         const handleSearch = () => {
-            const query = searchInput.value.trim();
-            if (query) {
-                applyFilters(query);
-            } else {
-                // If search is empty, go back to filtered discovery
-                applyFilters(null);
-            }
+            applyFilters();
         };
+
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            applyFilters(query);
+        }
+
         searchButton.addEventListener('click', handleSearch);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleSearch();
@@ -1261,9 +1258,9 @@
         };
         
         // --- Event Listeners ---
-        genreFilter.addEventListener('change', () => applyFilters(searchInput.value.trim()));
-        yearFilter.addEventListener('change', () => applyFilters(searchInput.value.trim()));
-        ratingFilter.addEventListener('change', () => applyFilters(searchInput.value.trim()));
+        genreFilter.addEventListener('change', () => applyFilters());
+        yearFilter.addEventListener('change', () => applyFilters());
+        ratingFilter.addEventListener('change', () => applyFilters());
 
         // Initial setup
         populateFilters();

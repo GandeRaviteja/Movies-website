@@ -13,6 +13,14 @@
             --muted: #9AA4AD;
             --text: #EEF2F6;
         }
+        [data-theme="light"] {
+            --bg-1: #eef2f6;
+            --bg-2: #f8fafc;
+            --accent: #E50914;
+            --card: rgba(0, 0, 0, 0.05);
+            --muted: #64748b;
+            --text: #1e293b;
+        }
 
         * {
             margin: 0;
@@ -25,6 +33,7 @@
             color: var(--text);
             background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         body::before {
@@ -47,7 +56,12 @@
             position: sticky;
             top: 0;
             z-index: 40;
+            border-bottom: 2px solid var(--accent);
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+        }
+        [data-theme="light"] header {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
         }
 
         header h1 {
@@ -65,7 +79,7 @@
 
         nav a {
             text-decoration: none;
-            color: #ccc;
+            color: #1e293b;
             font-weight: 500;
             transition: color 0.3s ease, transform 0.2s ease;
         }
@@ -97,6 +111,28 @@
             transform: translateY(-2px);
             color: var(--accent);
         }
+
+        /* --- Dropdown Menu CSS --- */
+        .menu-container { position: relative; }
+        .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 10px; font-size:13px; background: var(--bg-2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); display: none; flex-direction: column; width: 150px; z-index: 50; overflow: hidden; transform: scale(0.95); transform-origin: top right; transition: transform 0.2s ease-out, opacity 0.2s ease-out; opacity: 0; }
+        .dropdown-menu.visible { display: flex; transform: scale(1); opacity: 1; }
+        [data-theme="light"] .dropdown-menu { background: var(--bg-1); border-color: rgba(0, 0, 0, 0.1); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); }
+        .dropdown-menu .section-title { text-transform: uppercase; font-size: 0.75em; font-weight: 600; color: var(--muted); padding: 10px 16px 5px; border-left: none; }
+        .dropdown-menu a, .dropdown-menu .menu-item { color: var(--text); padding: 12px 16px; text-decoration: none; display: flex; align-items: center; gap: 12px; transition: background-color 0.2s ease, color 0.2s ease; white-space: nowrap; }
+        .dropdown-menu a:hover, .dropdown-menu .menu-item:hover { background-color: rgba(255, 255, 255, 0.1); }
+        [data-theme="light"] .dropdown-menu a:hover, [data-theme="light"] .dropdown-menu .menu-item:hover { background-color: rgba(0, 0, 0, 0.05); }
+        .dropdown-menu .logout { color: var(--accent); }
+        .dropdown-menu .logout:hover { background-color: var(--accent); color: #fff; }
+        .dropdown-menu svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .dropdown-menu .theme-toggle-wrapper { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+        .dropdown-menu .theme-toggle-wrapper span { display: flex; align-items: center; gap: 12px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: 0.4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: 0.4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        /* --- End Dropdown Menu CSS --- */
         
         .search-container-header {
             display: flex;
@@ -112,6 +148,9 @@
             margin-right: 8px;
             font-size: 14px;
             outline: none;
+        }
+        [data-theme="light"] .search-container-header input {
+            background: #f1f5f9;
         }
         
         .search-container-header button {
@@ -542,17 +581,42 @@
 <body>
 
     <header>
-        <h1><a href="main.html" style="text-decoration: none;color:white">🎬 TCB </a></h1>
+        <h1><a href="main.html" style="text-decoration: none;color:rgb(255, 0, 0)">🎬 TCB </a></h1>
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html" >Home</a></li>
                 <li><a href="genres.html" class="active">Genres</a></li>
                 <li><a href="toprated.html">Top Rated</a></li>
-                <li><a href="#">About</a></li>
-                <li>
-                    <div class="search-container-header">
-                        <input type="text" id="searchInput" placeholder="Search...">
-                        <button id="searchButton">Search</button>
+                <li><a href="about.html">About</a></li>
+                <li class="menu-container">
+                    <button id="menu-toggle" aria-label="Toggle menu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div id="dropdown-menu" class="dropdown-menu">
+                        <div class="section-title">Application</div>
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            Profile
+                        </a>
+                        <div class="theme-toggle-wrapper">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                Theme
+                            </span>
+                            <label class="switch">
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="section-title">Account</div>
+                        <a href="main.html" class="logout">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            Logout
+                        </a>
                     </div>
                 </li>
             </ul>
@@ -580,8 +644,12 @@
 
         <section class="main-content">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                <h2 class="section-title" id="genreTitle">Explore Tollywood Genres</h2>
+                <h2 class="section-title" id="genreTitle">Explore Telugu Genres</h2>
                 <button id="sortButton">Sort: Top to Bottom</button>
+            </div>
+            <div class="search-container-header" style="margin-bottom: 1.5rem; justify-content: center;">
+                <input type="text" id="searchInput" placeholder="Search within this genre..." style="width: 70%;">
+                <button id="searchButton">Search</button>
             </div>
             <div id="moviesContainer" class="movies-container">
                 </div>
@@ -616,6 +684,12 @@
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
         const sortButton = document.getElementById('sortButton');
+        const menuToggle = document.getElementById('menu-toggle');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+
 
         // Modal Elements
         const modalOverlay = document.getElementById('movieModalOverlay');
@@ -632,6 +706,30 @@
 
         // Set initial button text
         sortButton.textContent = 'Sort: Newest First';
+
+        // --- Dropdown Menu & Theme Toggling ---
+        menuToggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+            dropdownMenu.classList.toggle('visible');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!menuToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.remove('visible');
+            }
+        });
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'light') {
+                themeToggle.checked = true;
+            }
+        }
+        themeToggle.addEventListener('change', () => {
+            body.setAttribute('data-theme', themeToggle.checked ? 'light' : 'dark');
+            localStorage.setItem('theme', themeToggle.checked ? 'light' : 'dark');
+        });
 
 
         // --- 1. Function to Display Movie Cards (No Change) ---
@@ -878,7 +976,11 @@
         const performSearch = () => {
             const query = searchInput.value.trim();
             if (query) {
-                fetchSearchResults(query);
+                // When searching, we want to search within the currently selected genre
+                fetchSearchResults(query, currentGenreId);
+            } else {
+                // If search is cleared, fetch the genre movies again
+                fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
             }
         };
 
@@ -890,6 +992,10 @@
         });
 
         searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
         
         sortButton.addEventListener('click', toggleSortOrder);
 
