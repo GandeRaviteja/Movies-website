@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MovieZone - Explore Genres</title>
+    <title>TCB - Explore Genres</title>
     <style>
         :root {
             --bg-1: #0B0F13;
@@ -167,7 +167,7 @@
         }
         
         .genre-list a.active {
-            background: var(--accent); 
+            background: var(--accent);
             color: var(--text);
             font-weight: 600;
         }
@@ -184,17 +184,17 @@
         }
         
         #sortButton {
-            background: var(--accent);
+            background: #ff010e;
             color: white;
             border: none;
             padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: background 0.1s ease;
         }
         
         #sortButton:hover {
-            background: #b20710;
+            background: #bb1212;
         }
 
         .movies-container {
@@ -204,33 +204,36 @@
             justify-content: flex-start;
         }
 
+        /* --- UPDATED: Main Movie Card Size --- */
         .card {
             background: var(--card);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 10px;
             overflow: hidden;
-            width: 180px;
+            width: 140px; /* Reduced base width */
             flex-grow: 1;
+            max-width: 180px; /* Maximize efficiency on larger screens */
             transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
             cursor: pointer;
             display: flex;
             flex-direction: column;
+            position: relative; 
         }
 
         .card:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(229, 9, 20, 0.7); 
+            box-shadow: 0 0 20px rgba(229, 9, 20, 0.7);
         }
 
         .card img {
             width: 100%;
             display: block;
-            height: 270px;
+            height: 220px; /* Reduced image height to match new width aspect ratio */
             object-fit: cover;
         }
 
         .card .info {
-            padding: 15px;
+            padding: 10px; /* Reduced padding */
             text-align: center;
             flex-grow: 1;
             display: flex;
@@ -239,16 +242,16 @@
         }
 
         .card h3 {
-            font-size: 16px;
+            font-size: 14px; /* Reduced font size */
             margin-bottom: 5px;
             color: var(--text);
         }
 
         .card p {
-            font-size: 14px;
+            font-size: 13px; /* Reduced font size */
             color: var(--muted);
         }
-
+        
         footer {
             background: #111;
             text-align: center;
@@ -281,24 +284,270 @@
                 width: 100%;
             }
             .movies-container {
-                justify-content: center;
+                justify-content: space-around; /* Better distribution on mobile */
+            }
+            .card {
+                width: 45%; /* Allow two per row */
+                max-width: none;
+            }
+            .card img {
+                height: auto;
             }
             .section-title {
                 font-size: 1.5rem;
                 padding-left: 0.5rem;
             }
         }
+        
+        /* --- START Modal Styles (Trailer size retained from last update) --- */
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(8px);
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            overflow-y: auto; 
+        }
+
+        .detail-modal {
+            background: var(--bg-2);
+            width: 90%;
+            max-width: 1000px; 
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(229, 9, 20, 0.4);
+            position: relative;
+            max-height: 90vh; 
+            overflow-y: auto;
+            color: var(--text); 
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2rem;
+            color: var(--muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 110; 
+        }
+
+        .close-btn:hover {
+            color: var(--accent);
+        }
+        
+        .modal-title {
+            color: var(--accent); 
+            font-size: 2.5rem; 
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .modal-header-trailer {
+            display: flex;
+            gap: 30px; 
+            margin-bottom: 25px;
+            flex-wrap: wrap; 
+            align-items: flex-start;
+        }
+
+        .trailer-container {
+            /* Enforce specific dimensions */
+            width: 380px; 
+            height: 230px; 
+            min-width: 380px;
+            
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Ensure the iframe fills the container exactly */
+        .trailer-container iframe,
+        .trailer-container .unavailable {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .trailer-container .unavailable a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .trailer-container .unavailable {
+            color: var(--muted);
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .modal-info-right {
+            flex: 1; 
+            min-width: 300px; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-info-right h3 { 
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-top: 0px; 
+            margin-bottom: 10px;
+        }
+        
+        .modal-info-right .summary-text { 
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            color: var(--text);
+            max-height: 200px; 
+            overflow-y: auto;
+        }
+
+        .modal-info-right .rating { 
+            font-size: 1.1rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px; 
+            font-weight: 600;
+        }
+        
+        .modal-info-right .rating span {
+            color: gold;
+        }
+
+        #ottProviders {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px; 
+            margin-bottom: 20px;
+        }
+
+        .ott-badge {
+            background: var(--accent); 
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .ott-badge.not-available {
+            background: #555;
+        }
+
+        /* Similar Movies Section */
+        .similar-movies-section {
+            margin-top: 20px;
+        }
+        
+        .similar-movies-section h3 {
+            color: var(--text);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        #similarMoviesContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: flex-start;
+        }
+        
+        /* --- UPDATED: Similar Movie Card Size --- */
+        .similar-movie-card {
+            width: 90px; /* Reduced width */
+            text-align: center;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .similar-movie-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .similar-movie-card img {
+            width: 100%;
+            height: 135px; /* Reduced height to maintain aspect ratio */
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .similar-movie-card p {
+            font-size: 0.75rem; /* Reduced font size */
+            margin-top: 5px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 900px) {
+            .modal-header-trailer {
+                flex-direction: column;
+            }
+            
+            .trailer-container {
+                /* Reset fixed width for mobile, use aspect ratio padding */
+                width: 100%;
+                padding-top: 56.25%; /* 16:9 aspect ratio */
+                height: 0;
+                order: 1; 
+            }
+            
+            .modal-info-right {
+                order: 2; 
+                min-width: 100%;
+            }
+            
+            .modal-title {
+                font-size: 2rem;
+            }
+            
+            #similarMoviesContainer {
+                justify-content: space-around;
+            }
+        }
+        /* --- END Modal Styles --- */
+
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🎬 MovieZone</h1>
+        <h1><a href="main.html" style="text-decoration: none;color:white">🎬 TCB </a></h1>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="genres.html" class="active">Genres</a></li>
-                <li><a href="#">Top Rated</a></li>
+                <li><a href="toprated.html">Top Rated</a></li>
                 <li><a href="#">About</a></li>
                 <li>
                     <div class="search-container-header">
@@ -325,16 +574,14 @@
                 <li><a href="#" data-genre-id="10751" data-genre-name="Family">Family</a></li>
                 <li><a href="#" data-genre-id="36" data-genre-name="Historical">Historical</a></li>
                 <li><a href="#" data-genre-id="10752" data-genre-name="War">War</a></li>
-                <li><a href="#" data-genre-id="14" data-genre-name="Fantasy">Fantasy</a></li>
                 <li><a href="#" data-genre-id="99" data-genre-name="Documentary">Documentary</a></li>
-                <li><a href="#" data-genre-id="10770" data-genre-name="TV Movie">TV Movie</a></li>
             </ul>
         </aside>
 
         <section class="main-content">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
                 <h2 class="section-title" id="genreTitle">Explore Tollywood Genres</h2>
-                <button id="sortButton">Sort: Latest to Oldest</button>
+                <button id="sortButton">Sort: Top to Bottom</button>
             </div>
             <div id="moviesContainer" class="movies-container">
                 </div>
@@ -342,144 +589,342 @@
     </main>
 
     <footer>
-        © 2025 MovieZone. All Rights Reserved.
+        © 2025 TCB. All Rights Reserved.
     </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // !!! IMPORTANT: Replace 'YOUR_TMDB_API_KEY_HERE' with your actual TMDb API key.
-            const API_KEY = '6e82f9e86404f4565269c0749267f41c'; 
+    
+    <div id="movieModalOverlay" class="modal-overlay">
+        <div class="detail-modal">
+            <button class="close-btn" id="closeModalBtn">&times;</button>
             
-            const genreList = document.getElementById('genreList');
-            const genreLinks = genreList.querySelectorAll('a');
-            const genreTitle = document.getElementById('genreTitle');
-            const moviesContainer = document.getElementById('moviesContainer');
-            const searchInput = document.getElementById('searchInput');
-            const searchButton = document.getElementById('searchButton');
-            const sortButton = document.getElementById('sortButton'); 
+            <div id="modalContent">
+                <div style="text-align: center; padding: 50px;">
+                    <p>Loading movie details...</p>
+                </div>
+            </div>
 
-            // Set the default sort order to show the latest movies first
-            let currentSortOrder = 'primary_release_date.desc'; 
-            let currentGenreId = '28'; 
-            let currentGenreName = 'Action'; 
+        </div>
+    </div>
+   
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // !!! IMPORTANT: Replace 'bb39f92870d27e9174370323ef4bc6a0' with your actual key.
+        const API_KEY = 'bb39f92870d27e9174370323ef4bc6a0'; 
+        const genreList = document.getElementById('genreList');
+        const genreLinks = genreList.querySelectorAll('a');
+        const genreTitle = document.getElementById('genreTitle');
+        const moviesContainer = document.getElementById('moviesContainer');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const sortButton = document.getElementById('sortButton');
 
-            const fetchMoviesByGenre = async (genreId, genreName, sortOrder) => {
-                if (API_KEY === 'YOUR_TMDB_API_KEY_HERE' || !API_KEY) {
-                    console.warn("Please replace 'YOUR_TMDB_API_KEY_HERE' with your actual TMDb API key to fetch real movie data.");
-                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Please provide a valid API key to load movies.</p>';
-                    return;
-                }
-                
-                // This URL filters by Telugu language and the selected genre, without a vote count minimum
-                const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&with_original_language=te&sort_by=${sortOrder}`;
-                
-                moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Loading real movies...</p>';
-                genreTitle.textContent = `Tollywood ${genreName} Movies`;
+        // Modal Elements
+        const modalOverlay = document.getElementById('movieModalOverlay');
+        const modalContent = document.getElementById('modalContent');
+        const closeModalBtn = document.getElementById('closeModalBtn');
 
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
-                    displayMovies(data.results, genreName);
-                } catch (error) {
-                    console.error('There was a problem fetching the movies:', error);
-                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">Sorry, we could not load the movies for ' + genreName + ' at this time. Please check your API key and network connection.</p>';
-                }
-            };
+        // Get today's date in YYYY-MM-DD format for filtering future releases
+        const TODAY_DATE = new Date().toISOString().split('T')[0];
 
-            const displayMovies = (movies, currentGenreName) => {
-                moviesContainer.innerHTML = '';
-                if (movies.length === 0) {
-                    moviesContainer.innerHTML = '<p style="text-align: center; padding: 2rem; color: var(--muted);">No movies found for ' + currentGenreName + '.</p>';
-                }
-                movies.forEach(movie => {
-                    const movieCard = document.createElement('div');
-                    movieCard.classList.add('card');
-                    const imagePath = movie.poster_path ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : 'https://via.placeholder.com/300x450.png?text=No+Image+Found';
-                    const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
-                    
-                    movieCard.innerHTML = `
-                        <img src="${imagePath}" alt="${movie.title} Poster">
-                        <div class="info">
-                            <h3>${movie.title}</h3>
-                            <p>⭐ ${rating}</p>
-                        </div>
-                    `;
-                    moviesContainer.appendChild(movieCard);
-                });
-            };
+        // Sort order for release date (Newest First)
+        let currentSortOrder = 'primary_release_date.desc'; 
+        let currentGenreId = '28';
+        let currentGenreName = 'Action';
 
-            const handleGenreClick = (event) => {
-                event.preventDefault();
+        // Set initial button text
+        sortButton.textContent = 'Sort: Newest First';
 
-                genreLinks.forEach(link => link.classList.remove('active'));
-                const clickedLink = event.target;
-                clickedLink.classList.add('active');
 
-                currentGenreId = clickedLink.dataset.genreId;
-                currentGenreName = clickedLink.dataset.genreName;
-
-                const newUrl = `${window.location.pathname}?genreId=${currentGenreId}&genreName=${currentGenreName}`;
-                window.history.pushState({ path: newUrl }, '', newUrl);
-
-                fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
-            };
-            
-            const toggleSortOrder = () => {
-                if (currentSortOrder === 'primary_release_date.desc') {
-                    currentSortOrder = 'vote_average.desc';
-                    sortButton.textContent = 'Sort: Top Rated';
-                } else if (currentSortOrder === 'vote_average.desc') {
-                    currentSortOrder = 'vote_average.asc';
-                    sortButton.textContent = 'Sort: Bottom Rated';
-                } else {
-                    currentSortOrder = 'primary_release_date.desc';
-                    sortButton.textContent = 'Sort: Latest to Oldest';
-                }
-                fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
-            };
-
-            genreLinks.forEach(link => {
-                link.addEventListener('click', handleGenreClick);
-            });
-            
-            sortButton.addEventListener('click', toggleSortOrder);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const initialGenreId = urlParams.get('genreId');
-            const initialGenreName = urlParams.get('genreName');
-
-            if (initialGenreId && initialGenreName) {
-                const initialLink = document.querySelector(`a[data-genre-id="${initialGenreId}"]`);
-                if (initialLink) {
-                    initialLink.classList.add('active');
-                    currentGenreId = initialGenreId;
-                    currentGenreName = initialGenreName;
-                    fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
-                }
-            } else {
-                const defaultGenreLink = document.querySelector('a[data-genre-id="28"]');
-                if (defaultGenreLink) {
-                    defaultGenreLink.classList.add('active');
-                    fetchMoviesByGenre('28', 'Action', currentSortOrder);
-                }
+        // --- 1. Function to Display Movie Cards (No Change) ---
+        const displayMovies = (movies, sourceDescription) => {
+            moviesContainer.innerHTML = '';
+            if (movies.length === 0) {
+                genreTitle.textContent = "No Telugu Movies Found";
+                moviesContainer.innerHTML = `<p class="error-message">No Telugu movies found matching your ${sourceDescription}.</p>`;
+                return;
             }
             
-            const performSearch = () => {
-                const query = searchInput.value;
-                if (query.trim() !== '') {
-                    window.location.href = `index.html?searchQuery=${encodeURIComponent(query)}`;
-                }
-            };
-            searchButton.addEventListener('click', performSearch);
-            searchInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    performSearch();
-                }
+            movies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.classList.add('card');
+                
+                movieCard.dataset.movieId = movie.id; 
+                
+                const imagePath = movie.poster_path ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : 'https://via.placeholder.com/300x450.png?text=No+Image+Found';
+                const rating = movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A';
+                const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A';
+                
+                movieCard.innerHTML = `
+                    <img src="${imagePath}" alt="${movie.title} Poster">
+                    <div class="info">
+                        <h3>${movie.title}</h3>
+                        <p>${releaseYear} | ⭐ ${rating}</p>
+                    </div>
+                `;
+                moviesContainer.appendChild(movieCard);
             });
+            
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', (event) => {
+                    if (!event.currentTarget.classList.contains('similar-movie-card')) {
+                        const movieId = card.dataset.movieId;
+                        fetchMovieDetails(movieId);
+                    }
+                });
+            });
+        };
+        
+        // --- 2. Function to Fetch All Details (Minor Change: Removed similarResponse promise) ---
+        const fetchMovieDetails = async (movieId) => {
+            if (!API_KEY) return;
+            
+            modalContent.innerHTML = '<div class="loading-message"><p>Loading movie details...</p></div>';
+            modalOverlay.style.display = 'flex'; 
+            
+            try {
+                // Fetch all details concurrently. Removed similarResponse as it's no longer used.
+                const [detailsResponse, providersResponse, videosResponse] = await Promise.all([
+                    fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=en-US`),
+                    fetch(`https://api.themoviedb.org/3/movie/${movieId}/watch/providers?api_key=${API_KEY}`),
+                    fetch(`https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${API_KEY}`)
+                ]);
+
+                const detailsData = await detailsResponse.json();
+                const providersData = await providersResponse.json();
+                // const similarData = await similarResponse.json(); // <-- REMOVED
+                const videosData = await videosResponse.json();
+
+                // Pass null for similar data since it's not fetched
+                displayModal(detailsData, providersData, null, videosData);
+
+            } catch (error) {
+                console.error('Error fetching movie details:', error);
+                modalContent.innerHTML = '<div class="error-message"><p>Could not load details for this movie. Check your network or API key.</p></div>';
+            }
+        };
+
+        // --- 3. Function to Display Modal (MODIFIED: Removed Similar Movies Logic/HTML) ---
+        const displayModal = (details, providers, similar, videos) => {
+            const rating = details.vote_average ? details.vote_average.toFixed(1) : 'N/A';
+            const overview = details.overview || "Summary not available.";
+            const title = details.title || "Movie Title";
+            // const movieGenreIds = details.genres.map(g => g.id); // <-- REMOVED
+
+            // --- 3a. Trailer Logic (No Change) ---
+            const youtubeVideos = videos.results.filter(video => video.site === 'YouTube');
+            let trailer;
+            const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            // 1. Try to find an official Telugu Trailer/Teaser with language code 'te'
+            trailer = youtubeVideos.find(
+                video => (video.type === 'Trailer' || video.type === 'Teaser') && video.iso_639_1 === 'te'
+            );
+            // 2. Fallback: Try to find an official Trailer/Teaser with "Telugu" in the name
+            if (!trailer) {
+                trailer = youtubeVideos.find(
+                    video => (video.type === 'Trailer' || video.type === 'Teaser') && 
+                            normalize(video.name).includes('telugu')
+                );
+            }
+            // 3. Fallback: Find the first official Trailer of any language
+            if (!trailer) {
+                trailer = youtubeVideos.find(
+                    video => video.type === 'Trailer'
+                );
+            }
+            
+            let trailerHtml;
+            if (trailer) {
+                const videoKey = trailer.key;
+                trailerHtml = `<iframe src="https://www.youtube.com/embed/${videoKey}" title="${title} Trailer" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            } else {
+                const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(title + ' Telugu Trailer')}`;
+                trailerHtml = `<div class="unavailable">No Trailer available from TMDB.<br><a href="${youtubeSearchUrl}" target="_blank" class="unavailable-link">Search on YouTube &rarr;</a></div>`;
+            }
+
+            // --- 3b. OTT Logic (No Change) ---
+            const streaming = providers.results.IN?.flatrate || [];
+            const limitedStreaming = streaming.slice(0, 3); 
+            
+            const ottHtml = limitedStreaming.length > 0
+                ? limitedStreaming.map(p => `<span class="ott-badge">${p.provider_name}</span>`).join('')
+                : `<span class="ott-badge not-available">Not currently available for streaming in India.</span>`;
+
+            // --- 3c. Similar Movies Logic: REMOVED ---
+
+            // --- 3d. Final Modal Content Assembly (MODIFIED: Removed Similar Movies HTML) ---
+            modalContent.innerHTML = `
+                <h2 class="modal-title">${title}</h2>
+
+                <div class="modal-header-trailer">
+                    <div class="trailer-container">
+                        ${trailerHtml}
+                    </div>
+
+                    <div class="modal-info-right">
+                        <h3>Summary</h3>
+                        <p class="summary-text">${overview}</p>
+
+                        <div class="rating">
+                            <span>⭐</span> ${rating}
+                        </div>
+                        
+                        <h3>Where to Watch</h3>
+                        <div id="ottProviders">${ottHtml}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Re-attach click listeners to the new similar movie cards in the modal (Not needed now, but good practice to clear if they were there)
+            // document.querySelectorAll('#similarMoviesContainer .similar-movie-card').forEach(card => {
+            //     card.addEventListener('click', () => {
+            //         const movieId = card.dataset.movieId;
+            //         fetchMovieDetails(movieId); 
+            //     });
+            // });
+        };
+
+
+        // --- Core Fetch Function for Genres (No Change) ---
+        const fetchMoviesByGenre = async (genreId, genreName, sortOrder) => {
+            if (!API_KEY) {
+                moviesContainer.innerHTML = '<p class="error-message">Please provide a valid API key.</p>';
+                return;
+            }
+            
+            const url = `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&with_original_language=te&sort_by=${sortOrder}&primary_release_date.lte=${TODAY_DATE}`;
+            
+            moviesContainer.innerHTML = '<p class="loading-message">Loading real movies...</p>';
+            genreTitle.textContent = `Tollywood ${genreName} Movies`;
+            sortButton.style.display = 'inline-block'; 
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                displayMovies(data.results, `genre: ${genreName}`);
+            } catch (error) {
+                console.error('Fetching movies error:', error);
+                moviesContainer.innerHTML = '<p class="error-message">Sorry, failed to load movies.</p>';
+            }
+        };
+
+        // --- Search Function (No Change) ---
+        const fetchSearchResults = async (query) => {
+            if (!API_KEY) return;
+
+            const url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`;
+
+            moviesContainer.innerHTML = '<p class="loading-message">Searching for movies...</p>';
+            genreTitle.textContent = `Search Results for "${query}" (Tollywood)`;
+            sortButton.style.display = 'none'; 
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                
+                // Filter results for Telugu language AND released today or earlier
+                const filteredResults = data.results.filter(movie => 
+                    movie.original_language === 'te' && 
+                    movie.release_date && 
+                    movie.release_date <= TODAY_DATE
+                );
+
+                displayMovies(filteredResults, `search query: "${query}"`);
+                
+                genreLinks.forEach(link => link.classList.remove('active'));
+
+            } catch (error) {
+                console.error('Fetching search results error:', error);
+                moviesContainer.innerHTML = '<p class="error-message">Sorry, an error occurred during the search.</p>';
+            }
+        };
+
+        // --- Event Handlers (No Change) ---
+        
+        const handleGenreClick = (event) => {
+            event.preventDefault();
+            genreLinks.forEach(link => link.classList.remove('active'));
+            const clickedLink = event.target;
+            clickedLink.classList.add('active');
+            searchInput.value = ''; 
+
+            currentGenreId = clickedLink.dataset.genreId;
+            currentGenreName = clickedLink.dataset.genreName;
+
+            const newUrl = `${window.location.pathname}?genreId=${currentGenreId}&genreName=${currentGenreName}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+
+            fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
+        };
+        
+        const toggleSortOrder = () => {
+            if (sortButton.style.display === 'none') return; 
+
+            if (currentSortOrder === 'primary_release_date.desc') {
+                currentSortOrder = 'primary_release_date.asc'; // Oldest First
+                sortButton.textContent = 'Sort: Oldest First';
+            } else {
+                currentSortOrder = 'primary_release_date.desc'; // Newest First
+                sortButton.textContent = 'Sort: Newest First';
+            }
+            fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
+        };
+        
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                fetchSearchResults(query);
+            }
+        };
+
+
+        // Initialization and Event Listeners
+
+        genreLinks.forEach(link => {
+            link.addEventListener('click', handleGenreClick);
         });
-    </script>
+
+        searchButton.addEventListener('click', performSearch);
+        
+        sortButton.addEventListener('click', toggleSortOrder);
+
+        closeModalBtn.addEventListener('click', () => {
+            modalOverlay.style.display = 'none';
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.style.display = 'none';
+            }
+        });
+        
+        // Initial Load Logic
+        const urlParams = new URLSearchParams(window.location.search);
+        const genreParamId = urlParams.get('genreId');
+        const genreParamName = urlParams.get('genreName');
+
+        if (genreParamId && genreParamName) {
+            currentGenreId = genreParamId;
+            currentGenreName = genreParamName;
+            const activeLink = Array.from(genreLinks).find(link => link.dataset.genreId === currentGenreId);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            } else {
+                genreLinks[0].classList.add('active');
+            }
+            fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder);
+        } else {
+            genreLinks[0].classList.add('active');
+            fetchMoviesByGenre(currentGenreId, currentGenreName, currentSortOrder); 
+        }
+    });
+</script>
+
+        <!-- UP IS MAIN SCRIPT WHERE SIMILAR MOVIES IS REMOVED -->
 </body>
 </html>
