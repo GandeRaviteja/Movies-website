@@ -15,7 +15,7 @@ closeLoginModalButton.addEventListener('click', () => {
 
 // Redirect to main website on guest click
 guestButton.addEventListener('click', () => {
-    window.location.href = '/Movies-website/index/index.html'; // Change 'main.html' to your main website file
+    window.location.href = 'index.html'; // Change 'main.html' to your main website file
 });
 
 // Close the modal if the user clicks outside of it
